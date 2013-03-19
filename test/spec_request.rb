@@ -131,7 +131,7 @@ describe Rack::Request do
     old, Rack::Utils.key_space_limit = Rack::Utils.key_space_limit, 1
     begin
       req = Rack::Request.new(env)
-      lambda { req.GET }.should.raise(RangeError)
+      req.GET.should.not.include 'foo'
     ensure
       Rack::Utils.key_space_limit = old
     end
@@ -143,8 +143,8 @@ describe Rack::Request do
 
     old, Rack::Utils.key_space_limit = Rack::Utils.key_space_limit, 3
     begin
-      lambda { Rack::Request.new(nested_query).GET }.should.not.raise(RangeError)
-      lambda { Rack::Request.new(plain_query).GET  }.should.raise(RangeError)
+      Rack::Request.new(nested_query).GET.should.include 'foo'
+      Rack::Request.new(plain_query).GET.should.not.include 'foo_bar__baz__qux_'
     ensure
       Rack::Utils.key_space_limit = old
     end
@@ -190,7 +190,8 @@ describe Rack::Request do
     old, Rack::Utils.key_space_limit = Rack::Utils.key_space_limit, 1
     begin
       req = Rack::Request.new(env)
-      lambda { req.POST }.should.raise(RangeError)
+      req.POST.should.not.include 'foo'
+      req.POST.should.not.include 'quux'
     ensure
       Rack::Utils.key_space_limit = old
     end
